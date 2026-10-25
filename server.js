@@ -1,11 +1,9 @@
 // HelloWorld 网站 —— Node.js + Express
 // 我的第一个 AI 开发的网站
-
+// 兼容本地运行与 Vercel 部署（Vercel 需要导出 app，本地用 require.main 判断启动）
 const express = require('express');
 
 const app = express();
-// Vercel 部署时会自动注入 PORT，本地运行默认 3000
-const port = process.env.PORT || 3000;
 
 // 首页路由：显示问候语和当前服务器时间
 app.get('/', (req, res) => {
@@ -45,7 +43,7 @@ app.get('/', (req, res) => {
       </head>
       <body>
         <div class="card">
-          <h1>Hello World！我是【你的名字】，我的第一个AI开发的网站</h1>
+          <h1>Hello World！我是王鸣语，我的第一个AI开发的网站</h1>
           <p>当前服务器时间：${year}年${month}月${day}日 ${serverTime}</p>
           <div class="time">本页面由 Node.js 动态生成 · Powered by 豆包 AI</div>
           <span class="badge">🚀 已成功部署上线</span>
@@ -55,7 +53,13 @@ app.get('/', (req, res) => {
   `);
 });
 
-// 启动服务
-app.listen(port, () => {
-  console.log(`✅ HelloWorld 网站已启动：http://localhost:${port}`);
-});
+// Vercel 部署：导出 app，交给平台作为 serverless 函数处理
+module.exports = app;
+
+// 本地运行：仅在直接执行 node server.js 时启动监听（Vercel 上不会触发）
+if (require.main === module) {
+  const port = process.env.PORT || 3000;
+  app.listen(port, () => {
+    console.log(`HelloWorld 网站已启动：http://localhost:${port}`);
+  });
+}
